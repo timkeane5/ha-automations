@@ -1,0 +1,221 @@
+blueprint:
+  name: Philips Hue Smart Dimmer Switch V2 (RWL022)
+  description: ''
+  domain: automation
+  input:
+    dimmer_switch:
+      name: Dimmer Switch
+      description: The controller device to use for the automation.
+      default: ''
+      selector:
+        device:
+          filter:
+          - model: RWL022
+          multiple: false
+    helper_last_event:
+      name: Helper - Last Event (Required)
+      description: Input Text used to store the last event sent from the controller.
+        This is required as the Hue Dimmer Switch sends out multiple events for each
+        button press and the meaning of an event can change depending on what the
+        previous event was. You will need to create this manually.
+      default: ''
+      selector:
+        entity:
+          domain:
+          - input_text
+          multiple: false
+    on_press_action:
+      name: Power Short Press (Optional)
+      description: Action to perform on short press of power button
+      default: []
+      selector:
+        action: {}
+    on_long_press_action:
+      name: Power Long Press (Optional)
+      description: Action to perform on long press of power button
+      default: []
+      selector:
+        action: {}
+    on_double_press_action:
+      name: Power Double Press (Optional)
+      description: Action to perform on double press of power button
+      default: []
+      selector:
+        action: {}
+    on_triple_press_action:
+      name: Power Triple Press (Optional)
+      description: Action to perform on triple press of power button
+      default: []
+      selector:
+        action: {}
+    off_short_press_action:
+      name: Hue Short Press (Optional)
+      description: Action to perform on short press of Hue button
+      default: []
+      selector:
+        action: {}
+    off_long_press_action:
+      name: Hue Long Press (Optional)
+      description: Action to perform on long press of Hue button
+      default: []
+      selector:
+        action: {}
+    off_double_press_action:
+      name: Hue Double Press (Optional)
+      description: Action to perform on double press of Hue button
+      default: []
+      selector:
+        action: {}
+    off_triple_press_action:
+      name: Hue Triple Press (Optional)
+      description: Action to perform on triple press of Hue button
+      default: []
+      selector:
+        action: {}
+    up_short_press_action:
+      name: Up Short Press (Optional)
+      description: Action to perform on short press of Hue button
+      default: []
+      selector:
+        action: {}
+    up_hold_action:
+      name: Up Long Press (Optional)
+      description: Action to perform on long press of Hue button
+      default: []
+      selector:
+        action: {}
+    up_double_press_action:
+      name: Up Double Press (Optional)
+      description: Action to perform on double press of Hue button
+      default: []
+      selector:
+        action: {}
+    up_triple_press_action:
+      name: Up Triple Press (Optional)
+      description: Action to perform on triple press of Hue button
+      default: []
+      selector:
+        action: {}
+    down_short_press_action:
+      name: Up Short Press (Optional)
+      description: Action to perform on short press of Hue button
+      default: []
+      selector:
+        action: {}
+    down_hold_action:
+      name: Up Long Press (Optional)
+      description: Action to perform on long press of Hue button
+      default: []
+      selector:
+        action: {}
+    down_double_press_action:
+      name: Up Double Press (Optional)
+      description: Action to perform on double press of Hue button
+      default: []
+      selector:
+        action: {}
+    down_triple_press_action:
+      name: Up Triple Press (Optional)
+      description: Action to perform on triple press of Hue button
+      default: []
+      selector:
+        action: {}
+  source_url: https://github.com/timkeane5/ha-automations/blob/develop/PhilipsRWL022.yaml
+trigger:
+- platform: event
+  event_type:
+  - zha_event
+  event_data:
+    device_id: !input dimmer_switch
+condition: []
+action:
+- variables:
+    helper_last_event_var: !input helper_last_event
+    last_action: "{{ (states(helper_last_event_var) | from_json).a }}"
+- service: input_text.set_value
+  data:
+    entity_id: !input helper_last_event
+    value: '{{ {"a": trigger.event.data.command ,"t":as_timestamp(now())} | to_json
+      }}'
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''on_press'' and last_action
+        == ''on_short_release''}}'
+    sequence: !input on_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''on_long_release'' and last_action
+        == ''on_hold''}}'
+    sequence: !input on_long_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''on_double_press'' and last_action
+        == ''on_short_release''}}'
+    sequence: !input on_double_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''on_triple_press'' and last_action
+        == ''on_short_release''}}'
+    sequence: !input on_triple_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''off_press'' and last_action
+        == ''off_short_release''}}'
+    sequence: !input off_short_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''off_long_release'' and last_action
+        == ''off_hold''}}'
+    sequence: !input off_long_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''off_double_press'' and last_action
+        == ''off_short_release''}}'
+    sequence: !input off_double_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''on_triple_press'' and last_action
+        == ''off_short_release''}}'
+    sequence: !input off_triple_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''up_press'' and last_action
+        == ''up_short_release''}}'
+    sequence: !input up_short_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''up_long_release'' and last_action
+        == ''up_hold''}}'
+    sequence: !input up_hold_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''up_double_press'' and last_action
+        == ''up_short_release''}}'
+    sequence: !input up_double_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''up_triple_press'' and last_action
+        == ''up_short_release''}}'
+    sequence: !input up_triple_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''down_press'' and last_action
+        == ''down_short_release''}}'
+    sequence: !input down_short_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''down_long_release'' and
+        last_action == ''down_hold''}}'
+    sequence: !input down_hold_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''down_double_press'' and
+        last_action == ''down_short_release''}}'
+    sequence: !input down_double_press_action
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == ''down_triple_press'' and
+        last_action == ''down_short_release''}}'
+    sequence: !input down_triple_press_action
+mode: queued
