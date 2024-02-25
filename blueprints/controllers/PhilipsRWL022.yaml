@@ -131,8 +131,8 @@ blueprint:
       selector:
         boolean:
     down_short_press_action:
-      name: Up Short Press (Optional)
-      description: Action to perform on short press of Up button
+      name: Down Short Press (Optional)
+      description: Action to perform on short press of Down button
       default: []
       selector:
         action: {}
