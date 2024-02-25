@@ -1,6 +1,7 @@
 blueprint:
   name: Philips Hue Smart Dimmer Switch V2 (RWL022)
   description: ''
+  source_url: https://github.com/timkeane5/ha-automations/blob/develop/PhilipsRWL022.yaml
   domain: automation
   input:
     dimmer_switch:
@@ -30,48 +31,70 @@ blueprint:
       default: []
       selector:
         action: {}
-    on_long_press_action:
-      name: Power Long Press (Optional)
-      description: Action to perform on long press of power button
+    on_hold_action:
+      name: Power Long Press/Hold (Optional)
+      description: Action to perform on long press/hold of Power button. If Power Long Press Type is set to Long Press this action will occur once, if it is set to Hold this action will repeat until the button is released.
       default: []
       selector:
         action: {}
+    on_long_press_type:
+      name: Power Long Press Type
+      description: Choose whether a long press of the power button should be considered a Long Press (fires once the button is released), or a Hold (fires continuously until the button is released)
+      default: l
+      selector:
+        select:
+          options:
+            - label: Long Press
+              value: l
+            - label: Hold
+              value: h
     on_double_press_action:
       name: Power Double Press (Optional)
-      description: Action to perform on double press of power button
+      description: Action to perform on double press of Power button
       default: []
       selector:
         action: {}
-    on_triple_press_action:
-      name: Power Triple Press (Optional)
-      description: Action to perform on triple press of power button
-      default: []
+    on_press_all_single:
+      name: Treat All Presses as Single Presses (Power Button)
+      description: If if this is set, the automation will respond to every press of the power button ignoring the double press and any of the other multi-press events the controller sends.
+      default: false
       selector:
-        action: {}
+        boolean:
     off_short_press_action:
       name: Hue Short Press (Optional)
       description: Action to perform on short press of Hue button
       default: []
       selector:
         action: {}
-    off_long_press_action:
-      name: Hue Long Press (Optional)
-      description: Action to perform on long press of Hue button
+    off_hold_action:
+      name: Hue Long Press/Hold (Optional)
+      description: Action to perform on long press/hold of Hue button. If Hue Long Press Type is set to Long Press this action will occur once, if it is set to Hold this action will repeat until the button is released.
       default: []
       selector:
         action: {}
+    off_long_press_type:
+      name: Hue Long Press Type
+      description: Choose whether a long press of the Hue button should be considered a Long Press (fires once the button is released), or a Hold (fires continuously until the button is released)
+      default: l
+      selector:
+        select:
+          options:
+            - label: Long Press
+              value: l
+            - label: Hold
+              value: h
     off_double_press_action:
       name: Hue Double Press (Optional)
       description: Action to perform on double press of Hue button
       default: []
       selector:
         action: {}
-    off_triple_press_action:
-      name: Hue Triple Press (Optional)
-      description: Action to perform on triple press of Hue button
-      default: []
+    off_press_all_single:
+      name: Treat All Presses as Single Presses (Hue Button)
+      description: If if this is set, the automation will respond to every press of the hue button ignoring the double press and any of the other multi-press events the controller sends.
+      default: false
       selector:
-        action: {}
+        boolean:
     up_short_press_action:
       name: Up Short Press (Optional)
       description: Action to perform on short press of Hue button
@@ -79,48 +102,70 @@ blueprint:
       selector:
         action: {}
     up_hold_action:
-      name: Up Long Press (Optional)
-      description: Action to perform on long press of Hue button
+      name: Up Long Press/Hold (Optional)
+      description: Action to perform on long press/hold of Up button. If Up Long Press Type is set to Long Press this action will occur once, if it is set to Hold this action will repeat until the button is released.
       default: []
       selector:
         action: {}
+    up_long_press_type:
+      name: Up Long Press Type
+      description: Choose whether a long press of the Up button should be considered a Long Press action (fires once the button is released), or a Hold action (fires continuously until the button is released)
+      default: h
+      selector:
+        select:
+          options:
+            - label: Long Press
+              value: l
+            - label: Hold
+              value: h
     up_double_press_action:
       name: Up Double Press (Optional)
-      description: Action to perform on double press of Hue button
+      description: Action to perform on double press of Up button
       default: []
       selector:
         action: {}
-    up_triple_press_action:
-      name: Up Triple Press (Optional)
-      description: Action to perform on triple press of Hue button
-      default: []
+    up_press_all_single:
+      name: Treat All Presses as Single Presses (Up Button)
+      description: If if this is set, the automation will respond to every press of the up button ignoring the double press and any of the other multi-press events the controller sends.
+      default: false
       selector:
-        action: {}
+        boolean:
     down_short_press_action:
       name: Up Short Press (Optional)
-      description: Action to perform on short press of Hue button
+      description: Action to perform on short press of Up button
       default: []
       selector:
         action: {}
     down_hold_action:
-      name: Up Long Press (Optional)
-      description: Action to perform on long press of Hue button
+      name: Down Long Press/Hold (Optional)
+      description: Action to perform on long press/hold of Down button. If Down Long Press Type is set to Long Press this action will occur once, if it is set to Hold this action will repeat until the button is released.
       default: []
       selector:
         action: {}
+    down_long_press_type:
+      name: Down Long Press Type
+      description: Choose whether a long press of the down button should be considered a Long Press (fires once the button is released), or a Hold action (fires continuously until the button is released)
+      default: h
+      selector:
+        select:
+          options:
+            - label: Long Press
+              value: l
+            - label: Hold
+              value: h
     down_double_press_action:
-      name: Up Double Press (Optional)
-      description: Action to perform on double press of Hue button
+      name: Down Double Press (Optional)
+      description: Action to perform on double press of Down button
       default: []
       selector:
         action: {}
-    down_triple_press_action:
-      name: Up Triple Press (Optional)
-      description: Action to perform on triple press of Hue button
-      default: []
+    down_press_all_single:
+      name: Treat All Presses as Single Presses (Down Button)
+      description: If if this is set, the automation will respond to every press of the down button ignoring the double press and any of the other multi-press events the controller sends.
+      default: false
       selector:
-        action: {}
-  source_url: https://github.com/timkeane5/ha-automations/blob/develop/PhilipsRWL022.yaml
+        boolean:
+
 trigger:
 - platform: event
   event_type:
@@ -132,90 +177,162 @@ action:
 - variables:
     helper_last_event_var: !input helper_last_event
     last_action: "{{ (states(helper_last_event_var) | from_json).a }}"
+    on_long_press_type: !input on_long_press_type
+    off_long_press_type: !input off_long_press_type
+    up_long_press_type: !input up_long_press_type
+    down_long_press_type: !input down_long_press_type
+    on_press_all_single : !input on_press_all_single
+    off_press_all_single : !input off_press_all_single
+    up_press_all_single : !input up_press_all_single
+    down_press_all_single : !input down_press_all_single
+
 - service: input_text.set_value
   data:
     entity_id: !input helper_last_event
     value: '{{ {"a": trigger.event.data.command ,"t":as_timestamp(now())} | to_json
       }}'
 - choose:
+# Power Button
   - conditions:
+  # Power Short Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''on_press'' and last_action
-        == ''on_short_release''}}'
+      value_template: '{{ (not on_press_all_single and trigger.event.data.command == ''on_press'' and last_action
+        == ''on_short_release'') or (trigger.event.data.command == ''on_short_release'' and on_press_all_single)}}'
     sequence: !input on_press_action
   - conditions:
+    # Power Long Press
     - condition: template
       value_template: '{{ trigger.event.data.command == ''on_long_release'' and last_action
-        == ''on_hold''}}'
-    sequence: !input on_long_press_action
+        == ''on_hold'' and on_long_press_type == l}}'
+    sequence: !input on_hold_action
   - conditions:
+    # Power Hold
+    - condition: template
+      value_template: '{{trigger.event.data.command == ''on_hold'' and on_long_press_type == ''h'' and (last_event != ''on_hold'' and last_event != ''step'' and last_event != ''hold'') }}'
+    sequence:
+      - repeat:
+          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' }}'
+          sequence: 
+          - alias: on hold action
+            if: '{{ true }}'
+            then: !input on_hold_action
+          - alias: loop delay
+            if: '{{ true }}'
+            then:
+            - delay: '00:00:00.100'
+  - conditions:
+    # Power Double Press
     - condition: template
       value_template: '{{ trigger.event.data.command == ''on_double_press'' and last_action
-        == ''on_short_release''}}'
+        == ''on_short_release'' and not on_press_all_single}}'
     sequence: !input on_double_press_action
+
+
+  # Hue Button
   - conditions:
+    # Hue Short Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''on_triple_press'' and last_action
-        == ''on_short_release''}}'
-    sequence: !input on_triple_press_action
-  - conditions:
-    - condition: template
-      value_template: '{{ trigger.event.data.command == ''off_press'' and last_action
-        == ''off_short_release''}}'
+      value_template: '{{ (not off_press_all_single and trigger.event.data.command == ''off_press'' and last_action
+        == ''off_short_release'') or (trigger.event.data.command == ''off_short_release'' and off_press_all_single)}}'
     sequence: !input off_short_press_action
   - conditions:
+    # Hue Long Press
     - condition: template
       value_template: '{{ trigger.event.data.command == ''off_long_release'' and last_action
-        == ''off_hold''}}'
-    sequence: !input off_long_press_action
+        == ''off_hold'' and off_long_press_type == l}}'
+    sequence: !input off_hold_action
   - conditions:
+    # Hue Hold
+    - condition: template
+      value_template: '{{trigger.event.data.command == ''off_hold'' and off_long_press_type == ''h'' and (last_event != ''off_hold'' and last_event != ''step'' and last_event != ''hold'') }}'
+      # only get first hold event
+    sequence:
+      - repeat:
+          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' }}'
+          sequence: 
+          - alias: off hold action
+            if: '{{ true }}'
+            then: !input off_hold_action
+          - alias: loop delay
+            if: '{{ true }}'
+            then:
+            - delay: '00:00:00.100'
+  - conditions:
+    # Hue Double Press
     - condition: template
       value_template: '{{ trigger.event.data.command == ''off_double_press'' and last_action
-        == ''off_short_release''}}'
+        == ''off_short_release'' and not off_press_all_single}}'
     sequence: !input off_double_press_action
+
+  # Up Button
   - conditions:
+    # Up Short Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''on_triple_press'' and last_action
-        == ''off_short_release''}}'
-    sequence: !input off_triple_press_action
-  - conditions:
-    - condition: template
-      value_template: '{{ trigger.event.data.command == ''up_press'' and last_action
-        == ''up_short_release''}}'
+      value_template: '{{ (not up_press_all_single and trigger.event.data.command == ''up_press'' and last_action == ''up_short_release'') or (trigger.event.data.command == ''up_short_release'' and up_press_all_single)}}'
     sequence: !input up_short_press_action
   - conditions:
+    # Up Long Press
     - condition: template
       value_template: '{{ trigger.event.data.command == ''up_long_release'' and last_action
-        == ''up_hold''}}'
+        == ''up_hold'' and up_long_press_type == ''l''}}'
     sequence: !input up_hold_action
   - conditions:
+    # Up Hold
+    - condition: template
+      value_template: '{{trigger.event.data.command == ''up_hold'' and up_long_press_type == ''h'' and (last_event != ''up_hold'' and last_event != ''step'' and last_event != ''hold'') }}'
+      # only get first hold event
+    sequence:
+      - repeat:
+          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' }}'
+          sequence: 
+          - alias: up hold action
+            if: '{{ true }}'
+            then: !input up_hold_action
+          - alias: loop delay
+            if: '{{ true }}'
+            then:
+            - delay: '00:00:00.100'
+  - conditions:
+    # Up Double Press
     - condition: template
       value_template: '{{ trigger.event.data.command == ''up_double_press'' and last_action
-        == ''up_short_release''}}'
+        == ''up_short_release'' and not up_press_all_single}}'
     sequence: !input up_double_press_action
+
+  # Down Button
   - conditions:
+    # Down Short Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''up_triple_press'' and last_action
-        == ''up_short_release''}}'
-    sequence: !input up_triple_press_action
-  - conditions:
-    - condition: template
-      value_template: '{{ trigger.event.data.command == ''down_press'' and last_action
-        == ''down_short_release''}}'
+      value_template: '{{ (not down_press_all_single and trigger.event.data.command == ''down_press'' and last_action
+        == ''down_short_release'') or (trigger.event.data.command == ''down_short_release'' and down_press_all_single) }}'
     sequence: !input down_short_press_action
   - conditions:
+    # Down Long Press
     - condition: template
       value_template: '{{ trigger.event.data.command == ''down_long_release'' and
-        last_action == ''down_hold''}}'
+        last_action == ''down_hold'' and down_long_press_type == ''l''}}'
     sequence: !input down_hold_action
   - conditions:
+    # Down Hold
+    - condition: template
+      value_template: '{{trigger.event.data.command == ''down_hold'' and down_long_press_type == ''h'' and (last_event != ''down_hold'' and last_event != ''step'' and last_event != ''hold'') }}'
+      # only get first hold event
+    sequence:
+      - repeat:
+          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' }}'
+          sequence: 
+          - alias: down hold action
+            if: '{{ true }}'
+            then: !input down_hold_action
+          - alias: loop delay
+            if: '{{ true }}'
+            then:
+            - delay: '00:00:00.100'
+  - conditions:
+    #Down Double Press
     - condition: template
       value_template: '{{ trigger.event.data.command == ''down_double_press'' and
-        last_action == ''down_short_release''}}'
+        last_action == ''down_short_release'' and not down_press_all_single}}'
     sequence: !input down_double_press_action
-  - conditions:
-    - condition: template
-      value_template: '{{ trigger.event.data.command == ''down_triple_press'' and
-        last_action == ''down_short_release''}}'
-    sequence: !input down_triple_press_action
-mode: queued
+
+mode: parallel
