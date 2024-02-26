@@ -202,8 +202,7 @@ action:
   - conditions:
     # Power Long Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''on_long_release'' and last_action
-        == ''on_hold'' and on_long_press_type == l}}'
+      value_template: '{{ trigger.event.data.command == ''on_hold'' and on_long_press_type == l}}'
     sequence: !input on_hold_action
   - conditions:
     # Power Hold
@@ -211,7 +210,7 @@ action:
       value_template: '{{trigger.event.data.command == ''on_hold'' and on_long_press_type == ''h'' and (last_event != ''on_hold'' and last_event != ''step'' and last_event != ''hold'') }}'
     sequence:
       - repeat:
-          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' }}'
+          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' and ((states(helper_last_event_var) | from_json).a) != 'on_long_release' }}'
           sequence: 
           - alias: on hold action
             if: '{{ true }}'
@@ -238,8 +237,7 @@ action:
   - conditions:
     # Hue Long Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''off_long_release'' and last_action
-        == ''off_hold'' and off_long_press_type == l}}'
+      value_template: '{{ trigger.event.data.command == ''off_hold'' and off_long_press_type == l}}'
     sequence: !input off_hold_action
   - conditions:
     # Hue Hold
@@ -248,7 +246,7 @@ action:
       # only get first hold event
     sequence:
       - repeat:
-          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' }}'
+          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' and ((states(helper_last_event_var) | from_json).a) != 'off_long_release' }}'
           sequence: 
           - alias: off hold action
             if: '{{ true }}'
@@ -273,8 +271,7 @@ action:
   - conditions:
     # Up Long Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''up_long_release'' and last_action
-        == ''up_hold'' and up_long_press_type == ''l''}}'
+      value_template: '{{ trigger.event.data.command == ''up_hold'' and up_long_press_type == ''l''}}'
     sequence: !input up_hold_action
   - conditions:
     # Up Hold
@@ -309,8 +306,7 @@ action:
   - conditions:
     # Down Long Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''down_long_release'' and
-        last_action == ''down_hold'' and down_long_press_type == ''l''}}'
+      value_template: '{{ trigger.event.data.command == ''down_hold'' and down_long_press_type == ''l''}}'
     sequence: !input down_hold_action
   - conditions:
     # Down Hold
