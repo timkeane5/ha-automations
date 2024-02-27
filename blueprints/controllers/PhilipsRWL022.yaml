@@ -40,14 +40,14 @@ blueprint:
     on_long_press_type:
       name: Power Long Press Type
       description: Choose whether a long press of the power button should be considered a Long Press (fires once the button is released), or a Hold (fires continuously until the button is released)
-      default: l
+      default: 'long'
       selector:
         select:
           options:
             - label: Long Press
-              value: l
+              value: 'long'
             - label: Hold
-              value: h
+              value: 'hold'
     on_double_press_action:
       name: Power Double Press (Optional)
       description: Action to perform on double press of Power button
@@ -75,14 +75,14 @@ blueprint:
     off_long_press_type:
       name: Hue Long Press Type
       description: Choose whether a long press of the Hue button should be considered a Long Press (fires once the button is released), or a Hold (fires continuously until the button is released)
-      default: l
+      default: 'long'
       selector:
         select:
           options:
             - label: Long Press
-              value: l
+              value: 'long'
             - label: Hold
-              value: h
+              value: 'hold'
     off_double_press_action:
       name: Hue Double Press (Optional)
       description: Action to perform on double press of Hue button
@@ -110,14 +110,14 @@ blueprint:
     up_long_press_type:
       name: Up Long Press Type
       description: Choose whether a long press of the Up button should be considered a Long Press action (fires once the button is released), or a Hold action (fires continuously until the button is released)
-      default: h
+      default: 'hold'
       selector:
         select:
           options:
             - label: Long Press
-              value: l
+              value: 'long'
             - label: Hold
-              value: h
+              value: 'hold'
     up_double_press_action:
       name: Up Double Press (Optional)
       description: Action to perform on double press of Up button
@@ -145,14 +145,14 @@ blueprint:
     down_long_press_type:
       name: Down Long Press Type
       description: Choose whether a long press of the down button should be considered a Long Press (fires once the button is released), or a Hold action (fires continuously until the button is released)
-      default: h
+      default: 'hold'
       selector:
         select:
           options:
             - label: Long Press
-              value: l
+              value: 'long'
             - label: Hold
-              value: h
+              value: 'hold'
     down_double_press_action:
       name: Down Double Press (Optional)
       description: Action to perform on double press of Down button
@@ -165,6 +165,17 @@ blueprint:
       default: false
       selector:
         boolean:
+variables:
+  helper_last_event_var: !input helper_last_event
+  on_long_press_type: !input on_long_press_type
+  off_long_press_type: !input off_long_press_type
+  up_long_press_type: !input up_long_press_type
+  down_long_press_type: !input down_long_press_type
+  on_press_all_single : !input on_press_all_single
+  off_press_all_single : !input off_press_all_single
+  up_press_all_single : !input up_press_all_single
+  down_press_all_single : !input down_press_all_single
+  events_to_use: ['on_press', 'on_short_release', 'on_double_press', 'on_hold', 'on_long_release', 'off_press', 'off_short_release', 'off_double_press', 'off_hold', 'off_long_release', 'up_press', 'up_short_release', 'up_double_press', 'up_hold', 'up_long_release', 'down_press', 'down_short_release', 'down_double_press', 'down_hold', 'down_long_release', 'stop' ]
 
 trigger:
 - platform: event
@@ -172,45 +183,44 @@ trigger:
   - zha_event
   event_data:
     device_id: !input dimmer_switch
-condition: []
+
+condition:
+  - condition: template
+    value_template: '{{ trigger.event.data.command | string in events_to_use }}'
 action:
+
 - variables:
-    helper_last_event_var: !input helper_last_event
     last_action: "{{ (states(helper_last_event_var) | from_json).a }}"
-    on_long_press_type: !input on_long_press_type
-    off_long_press_type: !input off_long_press_type
-    up_long_press_type: !input up_long_press_type
-    down_long_press_type: !input down_long_press_type
-    on_press_all_single : !input on_press_all_single
-    off_press_all_single : !input off_press_all_single
-    up_press_all_single : !input up_press_all_single
-    down_press_all_single : !input down_press_all_single
+    trigger_command: "{{ trigger.event.data.command }}"
 
 - service: input_text.set_value
   data:
     entity_id: !input helper_last_event
-    value: '{{ {"a": trigger.event.data.command ,"t":as_timestamp(now())} | to_json
-      }}'
+    value: '{{ {"a": trigger.event.data.command ,"t":as_timestamp(now())} | to_json }}'
 - choose:
-# Power Button
+# BEGIN POWER BUTTON
+# Short Press
   - conditions:
-  # Power Short Press
     - condition: template
-      value_template: '{{ (not on_press_all_single and trigger.event.data.command == ''on_press'' and last_action
-        == ''on_short_release'') or (trigger.event.data.command == ''on_short_release'' and on_press_all_single)}}'
+      value_template: '{{ (on_press_all_single and trigger_command == ''on_short_release'') or (not on_press_all_single and trigger_command == ''on_press'' and last_action == ''on_short_release'') }}'
     sequence: !input on_press_action
+# Double Press
   - conditions:
-    # Power Long Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''on_hold'' and on_long_press_type == l}}'
+      value_template: '{{ trigger_command == ''on_double_press'' and not on_press_all_single }}'
+    sequence: !input on_double_press_action
+# Long Press
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger_command == ''on_hold'' and last_action != ''on_hold'' and on_long_press_type == ''long'' }}'
     sequence: !input on_hold_action
+# Hold
   - conditions:
-    # Power Hold
     - condition: template
-      value_template: '{{trigger.event.data.command == ''on_hold'' and on_long_press_type == ''h'' and (last_event != ''on_hold'' and last_event != ''step'' and last_event != ''hold'') }}'
+      value_template: '{{trigger_command == ''on_hold'' and last_action != ''on_hold'' and on_long_press_type == ''hold'' }}'
     sequence:
       - repeat:
-          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' and ((states(helper_last_event_var) | from_json).a) != 'on_long_release' }}'
+          while: '{{ (((states(helper_last_event_var) | from_json).a) != ''stop'') and (((states(helper_last_event_var) | from_json).a) != ''on_long_release'') }}'
           sequence: 
           - alias: on hold action
             if: '{{ true }}'
@@ -218,35 +228,32 @@ action:
           - alias: loop delay
             if: '{{ true }}'
             then:
-            - delay: '00:00:00.100'
-  - conditions:
-    # Power Double Press
-    - condition: template
-      value_template: '{{ trigger.event.data.command == ''on_double_press'' and last_action
-        == ''on_short_release'' and not on_press_all_single}}'
-    sequence: !input on_double_press_action
+            - delay: '00:00:00.250'
+# END POWER BUTTON
 
-
-  # Hue Button
+# BEGIN HUE/OFF BUTTON
+  # Short Press
   - conditions:
-    # Hue Short Press
     - condition: template
-      value_template: '{{ (not off_press_all_single and trigger.event.data.command == ''off_press'' and last_action
-        == ''off_short_release'') or (trigger.event.data.command == ''off_short_release'' and off_press_all_single)}}'
+      value_template: '{{ (off_press_all_single and trigger_command == ''off_short_release'') or (not off_press_all_single and trigger_command == ''off_press'' and last_action == ''off_short_release'') }}'
     sequence: !input off_short_press_action
+  # Double Press
   - conditions:
-    # Hue Long Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''off_hold'' and off_long_press_type == l}}'
+      value_template: '{{ trigger_command == ''off_double_press'' and not off_press_all_single }}'
+    sequence: !input off_double_press_action
+  # Hue Long Press
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger_command == ''off_hold'' and last_action != ''off_hold'' and off_long_press_type == ''long'' }}' # only get first hold event
     sequence: !input off_hold_action
+  # Hue Hold
   - conditions:
-    # Hue Hold
     - condition: template
-      value_template: '{{trigger.event.data.command == ''off_hold'' and off_long_press_type == ''h'' and (last_event != ''off_hold'' and last_event != ''step'' and last_event != ''hold'') }}'
-      # only get first hold event
+      value_template: '{{trigger_command == ''off_hold'' and last_action != ''off_hold'' and off_long_press_type == ''hold'' }}' # only get first hold event
     sequence:
       - repeat:
-          while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' and ((states(helper_last_event_var) | from_json).a) != 'off_long_release' }}'
+          while: '{{ (((states(helper_last_event_var) | from_json).a) != ''stop'') and (((states(helper_last_event_var) | from_json).a) != ''off_long_release'') }}'
           sequence: 
           - alias: off hold action
             if: '{{ true }}'
@@ -254,30 +261,29 @@ action:
           - alias: loop delay
             if: '{{ true }}'
             then:
-            - delay: '00:00:00.100'
-  - conditions:
-    # Hue Double Press
-    - condition: template
-      value_template: '{{ trigger.event.data.command == ''off_double_press'' and last_action
-        == ''off_short_release'' and not off_press_all_single}}'
-    sequence: !input off_double_press_action
+            - delay: '00:00:00.250'
+# END HUE/OFF BUTTON
 
-  # Up Button
+# BEGIN UP BUTTON
+  # Short Press
   - conditions:
-    # Up Short Press
     - condition: template
-      value_template: '{{ (not up_press_all_single and trigger.event.data.command == ''up_press'' and last_action == ''up_short_release'') or (trigger.event.data.command == ''up_short_release'' and up_press_all_single)}}'
+      value_template: '{{ (up_press_all_single and trigger_command == ''up_short_release'') or (not up_press_all_single and trigger_command == ''up_press'' and last_action == ''up_short_release'') }}'
     sequence: !input up_short_press_action
+  # Double Press
   - conditions:
-    # Up Long Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''up_hold'' and up_long_press_type == ''l''}}'
+      value_template: '{{ trigger_command == ''up_double_press'' and not up_press_all_single }}'
+    sequence: !input up_double_press_action
+  # Long Press
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger_command == ''up_hold'' and last_action != ''up_hold'' and up_long_press_type == ''long'' }}' # only get first hold event
     sequence: !input up_hold_action
+  # Hold
   - conditions:
-    # Up Hold
     - condition: template
-      value_template: '{{trigger.event.data.command == ''up_hold'' and up_long_press_type == ''h'' and (last_event != ''up_hold'' and last_event != ''step'' and last_event != ''hold'') }}'
-      # only get first hold event
+      value_template: '{{trigger_command == ''up_hold'' and last_action != ''up_hold'' and up_long_press_type == ''hold'' }}' # only get first hold event
     sequence:
       - repeat:
           while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' }}'
@@ -289,30 +295,28 @@ action:
             if: '{{ true }}'
             then:
             - delay: '00:00:00.100'
-  - conditions:
-    # Up Double Press
-    - condition: template
-      value_template: '{{ trigger.event.data.command == ''up_double_press'' and last_action
-        == ''up_short_release'' and not up_press_all_single}}'
-    sequence: !input up_double_press_action
+# END UP BUTTON
 
-  # Down Button
+# BEGIN DOWN BUTTON
+  # Short Press
   - conditions:
-    # Down Short Press
     - condition: template
-      value_template: '{{ (not down_press_all_single and trigger.event.data.command == ''down_press'' and last_action
-        == ''down_short_release'') or (trigger.event.data.command == ''down_short_release'' and down_press_all_single) }}'
+      value_template: '{{ (down_press_all_single and trigger_command == ''down_short_release'') or (not down_press_all_single and trigger_command == ''down_press'' and last_action == ''down_short_release'') }}'
     sequence: !input down_short_press_action
+  # Double Press
   - conditions:
-    # Down Long Press
     - condition: template
-      value_template: '{{ trigger.event.data.command == ''down_hold'' and down_long_press_type == ''l''}}'
+      value_template: '{{ trigger_command == ''down_double_press'' and not down_press_all_single }}'
+    sequence: !input down_double_press_action
+  # Long Press
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger_command == ''down_hold'' and last_action != ''down_hold'' and down_long_press_type == ''long'' }}' # only get first hold event
     sequence: !input down_hold_action
+  # Hold
   - conditions:
-    # Down Hold
     - condition: template
-      value_template: '{{trigger.event.data.command == ''down_hold'' and down_long_press_type == ''h'' and (last_event != ''down_hold'' and last_event != ''step'' and last_event != ''hold'') }}'
-      # only get first hold event
+      value_template: '{{trigger_command == ''down_hold'' and last_action != ''down_hold'' and down_long_press_type == ''hold'' }}' # only get first hold event
     sequence:
       - repeat:
           while: '{{ ((states(helper_last_event_var) | from_json).a) != ''stop'' }}'
@@ -323,12 +327,7 @@ action:
           - alias: loop delay
             if: '{{ true }}'
             then:
-            - delay: '00:00:00.100'
-  - conditions:
-    #Down Double Press
-    - condition: template
-      value_template: '{{ trigger.event.data.command == ''down_double_press'' and
-        last_action == ''down_short_release'' and not down_press_all_single}}'
-    sequence: !input down_double_press_action
+            - delay: '00:00:0.250'
+# END DOWN BUTTON
 
-mode: parallel
+mode: parallel # Use parallel to allow stop command to break hold loop
